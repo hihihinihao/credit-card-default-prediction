@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+
+# Model checkpoints (PyTorch)
+*.pth
+
+# Numpy arrays
+*.npy
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Generated PDF
+paper.pdf
+
+# Sample PDFs from other projects (not our source)
+DS_Sample*.pdf
+Sample*.pdf
+
+# Dataset (raw Excel)
+code/EDA/UCI_Credit_Card.xls
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,121 @@
+Model,Feature,Importance
+Gradient Boosting,recent_delay,0.221918
+Gradient Boosting,PAY_0,0.152642
+Gradient Boosting,delay_count,0.070357
+Gradient Boosting,max_delay,0.053385
+Gradient Boosting,credit_utilization,0.036216
+Gradient Boosting,bill_trend,0.031272
+Gradient Boosting,avg_pay_amt,0.029496
+Gradient Boosting,total_pay_bill_ratio,0.029401
+Gradient Boosting,LIMIT_BAL,0.025359
+Gradient Boosting,AGE,0.024206
+Gradient Boosting,max_pay_amt,0.022577
+Gradient Boosting,PAY_AMT3,0.021148
+Gradient Boosting,max_bill_amt,0.020709
+Gradient Boosting,severe_delay_count,0.020128
+Gradient Boosting,PAY_AMT2,0.01937
+Gradient Boosting,recent_pay_bill_ratio,0.017878
+Gradient Boosting,avg_bill_amt,0.017509
+Gradient Boosting,BILL_AMT5,0.017157
+Gradient Boosting,pay_trend,0.014751
+Gradient Boosting,avg_delay,0.013866
+Gradient Boosting,BILL_AMT6,0.013623
+Gradient Boosting,PAY_AMT4,0.013589
+Gradient Boosting,BILL_AMT3,0.011779
+Gradient Boosting,PAY_AMT6,0.011394
+Gradient Boosting,PAY_AMT5,0.011392
+Gradient Boosting,BILL_AMT2,0.011103
+Gradient Boosting,BILL_AMT4,0.010858
+Gradient Boosting,recent_bill_amt,0.008475
+Gradient Boosting,BILL_AMT1,0.00813
+Gradient Boosting,PAY_2,0.007877
+Gradient Boosting,EDUCATION,0.006905
+Gradient Boosting,PAY_AMT1,0.005273
+Gradient Boosting,recent_pay_amt,0.005031
+Gradient Boosting,MARRIAGE,0.002768
+Gradient Boosting,PAY_3,0.002696
+Gradient Boosting,PAY_6,0.002678
+Gradient Boosting,PAY_5,0.002666
+Gradient Boosting,PAY_4,0.002395
+Gradient Boosting,SEX,0.001969
+Gradient Boosting,recent_delay_flag,5.3e-05
+Random Forest,severe_delay_count,0.07414
+Random Forest,max_delay,0.070413
+Random Forest,delay_count,0.062813
+Random Forest,PAY_0,0.056258
+Random Forest,avg_delay,0.046832
+Random Forest,recent_delay,0.041526
+Random Forest,recent_delay_flag,0.036616
+Random Forest,credit_utilization,0.034427
+Random Forest,avg_pay_amt,0.029581
+Random Forest,LIMIT_BAL,0.027869
+Random Forest,PAY_2,0.026753
+Random Forest,max_bill_amt,0.026629
+Random Forest,total_pay_bill_ratio,0.02557
+Random Forest,max_pay_amt,0.025345
+Random Forest,bill_trend,0.024337
+Random Forest,avg_bill_amt,0.024002
+Random Forest,recent_bill_amt,0.021816
+Random Forest,BILL_AMT1,0.021196
+Random Forest,PAY_AMT2,0.021048
+Random Forest,PAY_AMT3,0.02076
+Random Forest,recent_pay_bill_ratio,0.020682
+Random Forest,AGE,0.020253
+Random Forest,pay_trend,0.019199
+Random Forest,recent_pay_amt,0.018901
+Random Forest,BILL_AMT2,0.018244
+Random Forest,BILL_AMT5,0.017917
+Random Forest,PAY_AMT4,0.017738
+Random Forest,BILL_AMT4,0.017671
+Random Forest,BILL_AMT6,0.017384
+Random Forest,BILL_AMT3,0.017297
+Random Forest,PAY_AMT6,0.017236
+Random Forest,PAY_AMT1,0.017105
+Random Forest,PAY_AMT5,0.016342
+Random Forest,PAY_3,0.012167
+Random Forest,PAY_5,0.009593
+Random Forest,PAY_4,0.006695
+Random Forest,EDUCATION,0.005958
+Random Forest,PAY_6,0.005074
+Random Forest,SEX,0.003633
+Random Forest,MARRIAGE,0.002981
+XGBoost,max_delay,0.1977510005235672
+XGBoost,delay_count,0.18298299610614777
+XGBoost,severe_delay_count,0.1624699980020523
+XGBoost,PAY_0,0.05336099863052368
+XGBoost,recent_delay,0.043898001313209534
+XGBoost,recent_bill_amt,0.013829999603331089
+XGBoost,avg_pay_amt,0.012985999695956707
+XGBoost,avg_delay,0.012949000112712383
+XGBoost,credit_utilization,0.012896000407636166
+XGBoost,avg_bill_amt,0.0123089998960495
+XGBoost,max_pay_amt,0.012078000232577324
+XGBoost,recent_pay_amt,0.012058000080287457
+XGBoost,PAY_AMT2,0.011959999799728394
+XGBoost,max_bill_amt,0.011884000152349472
+XGBoost,PAY_2,0.011401000432670116
+XGBoost,PAY_AMT3,0.011207999661564827
+XGBoost,BILL_AMT3,0.010937999933958054
+XGBoost,BILL_AMT2,0.010789000429213047
+XGBoost,total_pay_bill_ratio,0.010765000246465206
+XGBoost,bill_trend,0.010730000212788582
+XGBoost,PAY_4,0.010591999627649784
+XGBoost,recent_pay_bill_ratio,0.010579999536275864
+XGBoost,LIMIT_BAL,0.010276000015437603
+XGBoost,PAY_AMT6,0.010276000015437603
+XGBoost,BILL_AMT1,0.010261000134050846
+XGBoost,BILL_AMT5,0.010061999782919884
+XGBoost,pay_trend,0.01003700029104948
+XGBoost,PAY_AMT4,0.009991000406444073
+XGBoost,BILL_AMT6,0.00991700030863285
+XGBoost,BILL_AMT4,0.009769000113010406
+XGBoost,EDUCATION,0.009589999914169312
+XGBoost,PAY_AMT1,0.009584000334143639
+XGBoost,MARRIAGE,0.009358000010251999
+XGBoost,PAY_AMT5,0.009053999558091164
+XGBoost,AGE,0.00903099961578846
+XGBoost,PAY_3,0.008802000433206558
+XGBoost,SEX,0.008275000378489494
+XGBoost,PAY_6,0.0073899999260902405
+XGBoost,PAY_5,0.006504000164568424
+XGBoost,recent_delay_flag,0.0014059999957680702

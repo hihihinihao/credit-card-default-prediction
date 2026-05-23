@@ -1,0 +1,366 @@
+# 信用卡违约预测项目 EDA 总结
+
+---
+
+## 1. 数据集基础情况
+
+本项目使用的是信用卡客户违约预测数据集。数据集中共有 **30,000 条客户记录**。去掉 `ID` 和目标变量 `default.payment.next.month` 后，共有 **23 个可用于建模的原始特征**。
+
+目标变量 `default.payment.next.month` 表示客户下个月是否违约：
+
+- `0`：非违约客户
+- `1`：违约客户
+
+数据检查结果显示：
+
+- 缺失值数量：0
+- 重复行数量：0
+- 数据整体质量较好，可以直接进入后续分析和建模
+
+不过，部分分类变量存在非标准编码：
+
+- `EDUCATION` 中存在 `0 / 5 / 6`
+- `MARRIAGE` 中存在 `0`
+
+这些值不属于标准类别，因此后续建模前建议统一处理为 `Unknown/Others`。
+
+---
+
+## 2. 目标变量分布分析
+
+我首先分析了目标变量的分布。结果显示：
+
+- 非违约客户：**23,364 人，占 77.9%**
+- 违约客户：**6,636 人，占 22.1%**
+
+这说明数据集存在一定程度的类别不平衡。虽然不属于极端不平衡数据，但如果只使用 Accuracy 作为模型评价指标，可能会产生误导。
+
+例如，一个模型如果倾向于把大多数客户预测成“不违约”，也可能获得较高 Accuracy，但这并不代表它能有效识别真正的高风险违约客户。
+
+因此，后续 modeling 阶段不能只报告 Accuracy，还应该使用：
+
+- Precision
+- Recall
+- F1-score
+- ROC-AUC
+- PR-AUC
+- Confusion Matrix
+
+尤其是在信用卡违约预测这种风险管理场景中，Recall 和 F1-score 会比单纯 Accuracy 更有实际意义。
+
+---
+
+## 3. 人口统计变量与信用额度分析
+
+我分析了以下人口统计变量和违约率之间的关系：
+
+- `SEX`
+- `EDUCATION`
+- `MARRIAGE`
+- `AGE`
+
+初步观察发现：
+
+- 男性客户的违约率相对更高
+- 高中学历客户的违约率相对更高
+- `MARRIAGE = Others` 的客户违约率相对更高
+
+但是，这些变量涉及潜在的 fairness / ethical issue，因此在报告中应该谨慎解释。不能直接说性别、婚姻或教育程度“决定”违约风险，只能说这些变量在数据中表现出一定差异。
+
+相比之下，`LIMIT_BAL`，也就是信用额度，与违约状态之间的关系更清楚：
+
+- 非违约客户的信用额度中位数：**150,000**
+- 违约客户的信用额度中位数：**90,000**
+
+这说明违约客户整体信用额度更低。`LIMIT_BAL` 对后续建模有一定解释价值，可以作为重要基础变量保留。
+
+---
+
+## 4. 最近还款状态 PAY_0 与违约风险分析
+
+EDA 中最重要的发现来自还款状态变量，尤其是 `PAY_0`。
+
+`PAY_0` 表示最近一期还款状态。为了避免极端小样本类别造成不稳定，我将 `PAY_0` 重新分组为：
+
+- `≤0`：没有最近逾期或特殊还款状态
+- `1`
+- `2`
+- `3`
+- `4+`：严重逾期情况合并处理
+
+分析结果显示：
+
+- `PAY_0 ≤ 0` 的客户违约率只有 **13.8%**
+- 整体违约率是 **22.1%**
+- `PAY_0 = 1` 时违约率约 **33.9%**
+- `PAY_0 = 2` 时违约率约 **69.1%**
+- `PAY_0 = 3` 时违约率约 **75.8%**
+- `PAY_0 = 4+` 时违约率约 **63.1%**
+
+这个结果非常明显地说明：**最近还款状态是违约预测中最强的风险信号之一**。
+
+对后续 modeling 的帮助是：`PAY_0` 到 `PAY_6` 这组 repayment status variables 应该被重点保留和分析。
+
+---
+
+## 5. 历史还款状态热力图分析
+
+除了单独分析 `PAY_0`，我还分析了 `PAY_0` 到 `PAY_6` 的历史还款状态。
+
+为了让分析更稳定，我同样把每个月的还款状态分组为：
+
+- `≤0`
+- `1`
+- `2`
+- `3`
+- `4+`
+
+然后绘制了 grouped repayment status heatmap。
+
+结果显示，在大多数历史还款变量中，逾期状态越严重，对应的违约率越高。也就是说，不只是最近一期还款状态重要，过去几个月的还款行为也整体上和违约风险有明显关系。
+
+这说明后续建模不应该只看单个 `PAY_0`，而应该把 `PAY_0` 到 `PAY_6` 作为客户历史还款行为序列来理解。
+
+---
+
+## 6. 账单金额与还款金额分析
+
+我进一步分析了账单金额和还款金额变量：
+
+- `BILL_AMT1` 到 `BILL_AMT6`
+- `PAY_AMT1` 到 `PAY_AMT6`
+
+结果显示，违约客户的 median payment amount 整体低于非违约客户。也就是说，违约客户不仅更容易出现还款延迟，而且实际还款金额也更低。
+
+这个发现说明，payment amount behavior 也可以为违约预测提供有用信息。
+
+这部分分析支持后续构造一些金额行为特征，例如：
+
+- 平均账单金额
+- 平均还款金额
+- 最近还款金额
+- 还款金额 / 账单金额比例
+- 信用使用率
+
+---
+
+## 7. 原始特征相关性分析
+
+我做了原始特征与 default 的 Pearson correlation 分析。结果显示，与 default 最强正相关的是还款状态变量，尤其是：
+
+- `PAY_0`
+- `PAY_2`
+- `PAY_3`
+- `PAY_4`
+- `PAY_5`
+- `PAY_6`
+
+其中，`PAY_0` 和 default 的相关性约为 **0.325**，是原始变量中最强的正相关变量之一。
+
+另一方面，以下变量与 default 呈负相关：
+
+- `LIMIT_BAL`
+- `PAY_AMT1`
+- `PAY_AMT2`
+- `PAY_AMT3`
+- `PAY_AMT4`
+- `PAY_AMT5`
+
+这说明信用额度更高、还款金额更高的客户，违约风险通常更低。
+
+这个结果进一步证明：后续模型的核心信息主要来自 **repayment behavior**，而不是单纯的人口统计变量。
+
+---
+
+## 8. 行为特征工程
+
+基于前面的 EDA，我构造了一组新的 repayment-behavior features，用于总结客户过去几个月的还款行为。
+
+主要构造的行为特征包括：
+
+- `delay_count`：过去 6 期中出现逾期的月份数量
+- `severe_delay_count`：过去 6 期中严重逾期的月份数量
+- `max_delay`：最大逾期程度
+- `avg_delay`：平均还款状态
+- `recent_delay`：最近一期还款状态
+- `recent_delay_flag`：最近一期是否逾期
+- `credit_utilization`：信用使用率
+- `recent_pay_bill_ratio`：最近还款金额与账单金额比例
+- `total_pay_bill_ratio`：总还款金额与总账单金额比例
+
+然后我分析了这些行为特征与 default 的相关性。
+
+结果显示：
+
+- `severe_delay_count` 与 default 的相关性约为 **0.399**
+- `delay_count` 与 default 的相关性约为 **0.398**
+- `recent_delay_flag` 与 default 的相关性约为 **0.368**
+- `max_delay` 与 default 的相关性约为 **0.331**
+- `recent_delay` 与 default 的相关性约为 **0.325**
+- `avg_delay` 与 default 的相关性约为 **0.282**
+
+这些结果说明，聚合后的行为特征比单个原始变量更能概括客户的违约风险。
+
+这部分是我 EDA 对后续建模最重要的贡献之一。后续建模可以比较：
+
+- 只使用原始特征的模型
+- 使用原始特征 + 行为工程特征的模型
+
+如果加入行为特征后 Recall、F1、ROC-AUC 或 PR-AUC 提升，就可以作为我们项目的一个有效改进点。
+
+---
+
+## 9. delay_count 和 severe_delay_count 的直观验证
+
+为了验证行为特征确实有解释意义，我进一步画了 `delay_count` 和 `severe_delay_count` 对应的违约率图。
+
+结果显示：
+
+- `delay_count = 0` 时，违约率约 **11.7%**
+- `delay_count = 6` 时，违约率约 **70.3%**
+- `severe_delay_count = 0` 时，违约率约 **12.7%**
+- `severe_delay_count = 6` 时，违约率约 **77.4%**
+
+这说明历史逾期频率和违约风险之间存在非常明显的整体上升关系。
+
+这张图非常适合在 report 或 PPT 中展示，因为它能让读者一眼理解：
+
+> 客户过去逾期月份越多，未来违约风险越高。
+
+---
+
+## 10. EDA 对后续建模工作的帮助
+
+后续 modeling 不应该只是简单运行 Logistic Regression、Random Forest、SVM、XGBoost，然后比较 Accuracy。根据我的 EDA，后续建模应该重点关注以下几点。
+
+### 10.1 评价指标不能只用 Accuracy
+
+因为 default 类只有 22.1%，只看 Accuracy 会忽略模型对违约客户的识别能力。
+
+建议后续模型评估使用：
+
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- ROC-AUC
+- PR-AUC
+- Confusion Matrix
+
+### 10.2 重点关注 repayment status variables
+
+`PAY_0` 到 `PAY_6` 是最重要的一组原始特征。它们和违约风险关系最强，应该作为建模重点。
+
+### 10.3 加入行为工程特征
+
+建议后续建模加入构造的行为特征，例如：
+
+- `delay_count`
+- `severe_delay_count`
+- `max_delay`
+- `avg_delay`
+- `recent_delay_flag`
+- `credit_utilization`
+- `recent_pay_bill_ratio`
+- `total_pay_bill_ratio`
+
+这些特征有明确业务含义，而且和 default 强相关。
+
+### 10.4 做 raw features vs engineered features 对比
+
+建议后续模型设计一个对比实验：
+
+Raw Features Only
+vs.
+Raw Features + Engineered Behavior Features
+
+
+这样可以验证 EDA 中构造的特征是否真的能帮助模型。
+
+### 10.5 做 threshold optimization
+
+信用卡违约预测不是普通二分类问题。银行可能更关心能否识别高风险客户，因此后续可以测试不同预测阈值，例如：
+
+- 0.50
+- 0.40
+- 0.35
+- 0.30
+
+然后比较 Precision、Recall 和 F1-score 的变化。
+
+---
+
+## 11. 建议采用的建模实验设计
+
+后续 modeling 可以按以下顺序进行。
+
+### Step 1：Baseline Models
+
+- Logistic Regression
+- Decision Tree
+- KNN
+- SVM
+
+### Step 2：Stronger Models
+
+- Random Forest
+- Gradient Boosting
+- XGBoost / LightGBM
+
+### Step 3：Feature Setting Comparison
+
+比较：
+
+- 原始特征
+- 原始特征 + 行为工程特征
+
+### Step 4：Imbalance-aware Evaluation
+
+使用：
+
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- ROC-AUC
+- PR-AUC
+- Confusion Matrix
+
+### Step 5：Risk-sensitive Threshold Analysis
+
+比较不同 threshold 下模型表现，重点观察 Recall / Precision / F1 的 trade-off。
+
+### Step 6：Interpretability
+
+做 feature importance，重点解释：
+
+- `PAY_0`
+- `delay_count`
+- `severe_delay_count`
+- `LIMIT_BAL`
+- `PAY_AMT`
+- `credit_utilization`
+
+---
+
+## 12. 最终 EDA 结论
+
+这次 EDA 说明，我们的项目不应该被理解成一个普通的“信用卡违约二分类预测”。更准确地说，它应该是：
+
+> **基于客户历史还款行为的风险敏感型信用卡违约预测。**
+
+EDA 发现，违约风险主要和客户的历史还款行为有关，尤其是：
+
+- 最近还款状态
+- 历史逾期次数
+- 严重逾期次数
+- 实际还款金额
+- 信用额度
+
+基于这些发现，我构造了一组 repayment-behavior features，为后续建模提供了更有解释性的输入变量。
+
+后续的 modeling 部分可以围绕这些发现展开，而不是只做普通模型堆叠。
+
+最终，我们的项目亮点可以写成：
+
+> We extend standard credit card default prediction from a simple accuracy-oriented binary classification task to a risk-sensitive prediction problem, supported by repayment-behavior feature engineering and interpretable EDA.

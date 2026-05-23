@@ -1,0 +1,3 @@
+Model,Feature Set,Accuracy,Precision,Recall,F1-score,ROC-AUC,PR-AUC,Train Time (s),TN,FP,FN,TP
+Gradient Boosting,Set A,0.8158,0.6529,0.3572,0.4618,0.7722,0.5408,20.869,4421,252,853,474
+Gradient Boosting,Set B,0.818,0.6594,0.3662,0.4709,0.7778,0.5507,40.752,4422,251,841,486
