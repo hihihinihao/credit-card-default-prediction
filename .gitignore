@@ -19,6 +19,9 @@ venv/
 *.fdb_latexmk
 *.synctex.gz
 
+# Source paper (keep local, not in repo)
+paper.tex
+
 # Generated PDF
 paper.pdf
 
